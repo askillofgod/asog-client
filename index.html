@@ -216,8 +216,8 @@ input::placeholder,textarea::placeholder{color:#9AA4B8}
    설정 — Supabase 프로젝트를 만든 뒤 이 두 줄만 채우면
    실제 로그인과 저장이 켜집니다. 비워두면 체험 모드입니다.
    ═══════════════════════════════════════════════════════ */
-var SUPABASE_URL = "";
-var SUPABASE_KEY = "";
+var SUPABASE_URL = "https://qtiazentdzwzkgrsjbob.supabase.co";
+var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
 
 /* ═══════════════════════════════════════════════════════════════
    ASOG 고객 질문지 — 질문 정의
@@ -243,10 +243,14 @@ var SUPABASE_KEY = "";
    modules 에 적은 묶음만 그 고객에게 보입니다.
    고객이 늘면 줄을 하나씩 추가하시면 됩니다.               */
 var CLIENTS = {
-  "luxtile@naver.com": {
-    company: "비전필름",
+  // 테스트용 — 대표님 계정
+  "xxxaskillofgodxxx@gmail.com": {
+    company: "비전필름 (테스트)",
     modules: ["common", "migrate", "visionfilm"]
   }
+
+  // 실제 고객에게 열어드릴 때 아래 줄 앞의 // 를 지우세요
+  // "luxtile@naver.com": { company:"비전필름", modules:["common","migrate","visionfilm"] },
   // "another@example.com": { company:"○○기업", modules:["common"] },
 };
 
@@ -608,11 +612,17 @@ var CLOSING = [
     }
     $("login-btn").disabled = true;
     $("login-btn").textContent = "보내는 중…";
-    sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.href } })
+    sb.auth.signInWithOtp({ email: email, options: {
+        emailRedirectTo: location.origin + location.pathname,
+        shouldCreateUser: false
+      } })
       .then(function(r){
         $("login-btn").disabled = false;
         $("login-btn").textContent = "접속 링크 받기";
-        if(r.error){ return note("err", "보내지 못했습니다. 등록된 주소인지 확인해 주세요."); }
+        if(r.error){
+          return note("err", "보내지 못했습니다. Supabase에 초대된 계정인지 확인해 주세요. " +
+            "(" + (r.error.message || "") + ")");
+        }
         note("ok", email + " 으로 접속 링크를 보냈습니다. 메일함을 확인해 주세요. 링크는 한 시간 동안 유효합니다.");
       });
   });
@@ -657,7 +667,7 @@ var CLOSING = [
   function save(){
     if(DEMO){ return setSave("saved"); }
     sb.from("project_briefs").upsert({
-      user_id: user.id, email: user.email, answers: answers, updated_at: new Date().toISOString()
+      user_id: user.id, email: user.email, answers: answers
     }, { onConflict: "user_id" }).then(function(r){
       setSave(r.error ? "err" : "saved");
     });
@@ -816,18 +826,35 @@ var CLOSING = [
   if(DEMO){
     note("ok", "체험 모드입니다. 아무 이메일이나 넣고 눌러보시면 질문지가 열립니다. 저장은 이 창에서만 유지됩니다.");
   } else {
-    var tag = document.createElement("script");
-    tag.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    tag.onload = function(){
+    $("login-btn").disabled = true;
+    $("login-btn").textContent = "준비 중…";
+
+    function boot(){
+      if(!window.supabase || !window.supabase.createClient){ return fail(); }
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      $("login-btn").disabled = false;
+      $("login-btn").textContent = "접속 링크 받기";
       sb.auth.getSession().then(function(r){
         if(r.data && r.data.session){ user = r.data.session.user; openApp(); }
       });
       sb.auth.onAuthStateChange(function(ev, session){
         if(session && !user){ user = session.user; openApp(); }
       });
-    };
-    document.head.appendChild(tag);
+    }
+    function fail(){
+      $("login-btn").textContent = "연결 실패";
+      note("err", "접속에 필요한 파일을 불러오지 못했습니다. 새로고침해 주시고, " +
+        "그래도 안 되면 010-2835-5878로 연락 주세요.");
+    }
+    function loadScript(src, ok, bad){
+      var t = document.createElement("script");
+      t.src = src; t.onload = ok; t.onerror = bad;
+      document.head.appendChild(t);
+    }
+    // 같은 폴더의 파일을 먼저 쓰고, 없으면 외부 주소에서 받아옵니다.
+    loadScript("supabase.js", boot, function(){
+      loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.js", boot, fail);
+    });
   }
 })();
 </script>
