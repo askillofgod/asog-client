@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>프로젝트 시작 질문지 — ASOG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --navy:#0C2141; --brand:#0040C8; --bright:#246BFE; --pale:#EAF1FF;
+  --ground:#FFFFFF; --panel:#F7F8FA; --ink:#0C2141; --ink-2:#5A6478;
+  --rule:#D5DCE8; --rule-soft:#E8ECF3; --ok:#0E8A5F; --error:#C8102E;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:Pretendard,"Pretendard Variable",Inter,"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:18px;line-height:1.7;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,ul,li,label{margin:0}
+ul{padding:0;list-style:none}
+button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--bright);outline-offset:3px;border-radius:3px}
+a{color:var(--bright)}
+[hidden]{display:none!important}
+
+/* ── 로그인 ───────────────────────────── */
+.gate{min-height:100dvh;display:grid;place-items:center;padding:24px}
+.gate-in{width:100%;max-width:460px}
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:44px}
+.logo svg{width:30px;height:auto;color:var(--brand);display:block}
+.logo span{font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--ink-2)}
+.gate h1{font-size:34px;font-weight:300;line-height:1.25;letter-spacing:-.04em;margin-bottom:14px}
+.gate h1 b{font-weight:700}
+.gate .desc{color:var(--ink-2);font-size:17px;margin-bottom:32px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:15px;font-weight:600;margin-bottom:8px}
+.field .hint{font-size:15px;color:var(--ink-2);font-weight:400;margin-top:6px;display:block}
+input[type=text],input[type=email],input[type=url],input[type=tel],textarea,select{
+  width:100%;background:var(--ground);border:1.5px solid var(--rule);border-radius:4px;
+  padding:0 16px;height:56px;transition:border-color .12s}
+textarea{height:auto;min-height:118px;padding:14px 16px;line-height:1.65;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--brand);outline:none}
+input::placeholder,textarea::placeholder{color:#9AA4B8}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:60px;padding:0 28px;border:0;border-radius:4px;font-size:17px;font-weight:600;cursor:pointer;
+  background:var(--brand);color:#fff;width:100%}
+.btn:hover{background:#0037AC}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--brand);box-shadow:inset 0 0 0 1.5px var(--brand)}
+.btn.ghost:hover{background:var(--pale)}
+.btn.sm{height:48px;padding:0 20px;font-size:16px;width:auto}
+.msg{margin-top:18px;padding:16px 18px;border-radius:4px;font-size:16px;line-height:1.6}
+.msg.ok{background:var(--pale);color:var(--navy)}
+.msg.err{background:#FDECEF;color:var(--error)}
+.gate .fine{margin-top:32px;padding-top:20px;border-top:1px solid var(--rule-soft);
+  font-size:15px;color:var(--ink-2);line-height:1.65}
+
+/* ── 앱 ───────────────────────────────── */
+.top{position:sticky;top:0;z-index:20;background:var(--ground);
+  border-bottom:1px solid var(--rule);padding:14px 24px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top .logo{margin:0;flex:0 0 auto}
+.top .who{font-size:15px;color:var(--ink-2);margin-left:auto}
+.save-state{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--ink-2);
+  display:inline-flex;align-items:center;gap:7px}
+.save-state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--rule)}
+.save-state.saving::before{background:#D9A400}
+.save-state.saved::before{background:var(--ok)}
+.linkbtn{background:none;border:0;color:var(--bright);font-size:15px;cursor:pointer;padding:4px}
+
+.bar{height:3px;background:var(--rule-soft)}
+.bar i{display:block;height:100%;background:var(--brand);width:0;transition:width .25s}
+
+.shell{max-width:1120px;margin:0 auto;padding:0 24px;
+  display:grid;grid-template-columns:250px 1fr;gap:48px;align-items:start}
+.side{position:sticky;top:96px;padding:36px 0}
+.side ol{list-style:none;padding:0;margin:0}
+.side li{margin-bottom:2px}
+.side button{width:100%;text-align:left;background:none;border:0;cursor:pointer;
+  padding:11px 14px;border-radius:4px;font-size:16px;color:var(--ink-2);
+  display:flex;align-items:center;gap:11px;line-height:1.4}
+.side button:hover{background:var(--panel);color:var(--ink)}
+.side button[aria-current="true"]{background:var(--pale);color:var(--brand);font-weight:600}
+.side .n{font-family:var(--mono);font-size:12px;flex:0 0 auto;width:18px}
+.side .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:transparent;flex:0 0 auto}
+.side button.done .dot{background:var(--ok)}
+
+.main{padding:36px 0 96px;min-width:0}
+.step-h{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-2);margin-bottom:14px}
+.main h2{font-size:32px;font-weight:300;line-height:1.25;letter-spacing:-.04em;max-width:20ch}
+.main h2 b{font-weight:700}
+.main .intro{margin-top:14px;color:var(--ink-2);font-size:17px;max-width:56ch}
+.qs{margin-top:38px}
+.q{padding:26px 0;border-top:1px solid var(--rule-soft)}
+.q:first-child{border-top:0;padding-top:8px}
+.q .lab{display:block;font-size:19px;font-weight:600;line-height:1.5;margin-bottom:6px}
+.q .req{color:var(--brand);font-size:15px;margin-left:6px}
+.q .help{font-size:16px;color:var(--ink-2);margin-bottom:14px;line-height:1.6}
+.opts{display:flex;flex-wrap:wrap;gap:9px}
+.opt{display:inline-flex;align-items:center;gap:9px;padding:12px 18px;border-radius:4px;
+  border:1.5px solid var(--rule);cursor:pointer;font-size:16px;line-height:1.3;background:var(--ground)}
+.opt:hover{border-color:var(--bright)}
+.opt input{width:17px;height:17px;accent-color:var(--brand);margin:0;flex:0 0 auto}
+.opt.on{border-color:var(--brand);background:var(--pale);color:var(--brand);font-weight:600}
+.nav{display:flex;gap:12px;margin-top:44px;padding-top:26px;border-top:1px solid var(--rule)}
+.nav .sp{flex:1}
+
+.done-card{margin-top:38px;padding:32px;border-radius:6px;background:var(--pale)}
+.done-card h3{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+.done-card p{font-size:17px;line-height:1.7;max-width:56ch}
+.done-card p+p{margin-top:12px}
+
+.foot{border-top:1px solid var(--rule);padding:28px 24px 56px;
+  font-family:var(--mono);font-size:13px;color:var(--ink-2);text-align:center;letter-spacing:.05em}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .side{position:static;padding:20px 0 0;border-bottom:1px solid var(--rule-soft);min-width:0}
+  .side ol{display:flex;gap:6px;overflow-x:auto;padding-bottom:14px}
+  .side li{flex:0 0 auto}
+  .side button{white-space:nowrap;box-shadow:inset 0 0 0 1px var(--rule-soft)}
+  .side .dot{margin-left:4px}
+  .main{padding-top:28px}
+  .main h2{font-size:27px}
+  .btn{width:100%}
+  .nav{flex-direction:column-reverse}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ 로그인 화면 ══════════ -->
+<div class="gate" id="gate">
+  <div class="gate-in">
+    <div class="logo">
+      <svg viewBox="0 0 206 156.5" aria-label="ASOG"><path fill="currentColor" transform="translate(-100 -191.8516)" d="M 182.105469 192.21875 L 208.84375 192.054688 C 214.707031 192.023438 221.671875 191.851562 227.4375 192.34375 C 229.984375 194.890625 238.457031 212.917969 240.632812 217.242188 L 257.957031 251.289062 L 291.101562 316.398438 C 294.722656 323.558594 304.53125 340.863281 306 347.746094 C 290.953125 347.527344 275.644531 348.308594 260.5625 347.859375 C 258.621094 347.800781 256.699219 347.652344 254.765625 347.464844 C 253.019531 344.929688 249.984375 338.578125 248.535156 335.554688 C 245.238281 328.679688 242.238281 322.019531 238.660156 315.25 C 234.820312 315.757812 231.878906 316.945312 228.308594 318.378906 C 223.046875 320.789062 218.21875 321.585938 212.984375 323.558594 L 167.554688 340.570312 C 163.425781 342.089844 151.210938 347.234375 147.476562 347.457031 C 132.484375 348.347656 115.015625 347.667969 100 347.804688 C 108.871094 329.621094 118.605469 311.1875 127.679688 293.101562 L 178.039062 192.714844 C 178.925781 192.511719 181.109375 192.328125 182.105469 192.21875 Z M 172.667969 301.621094 C 182.664062 301.445312 192.992188 301.992188 203.046875 301.828125 C 210.34375 301.828125 225.570312 302.132812 232.296875 301.238281 C 226.097656 285.265625 217.566406 270.214844 210.613281 254.539062 C 210.042969 253.253906 203.351562 239.644531 203.089844 239.484375 C 193.257812 256.480469 186.019531 276.074219 176.691406 293.441406 C 175.398438 295.847656 173.710938 299.136719 172.667969 301.621094 Z"/></svg>
+      <span>ASOG · 고객 전용</span>
+    </div>
+    <h1>프로젝트 시작<br><b>질문지</b></h1>
+    <p class="desc">이메일 주소를 넣으시면 접속 링크를 보내드립니다. 비밀번호를 따로 만드실 필요는 없습니다.</p>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="email">이메일 주소</label>
+        <input type="email" id="email" name="email" placeholder="name@company.com" autocomplete="email" required>
+        <span class="hint">계약 담당자로 등록된 주소만 접속할 수 있습니다.</span>
+      </div>
+      <button class="btn" type="submit" id="login-btn">접속 링크 받기</button>
+    </form>
+    <div id="login-msg"></div>
+
+    <p class="fine">
+      이 페이지는 진행 중인 프로젝트의 고객만 사용합니다. 작성하신 내용은 프로젝트 진행 목적으로만 쓰이며,
+      계약 종료 후 정해진 기간이 지나면 삭제합니다.<br><br>
+      접속이 안 되시면 010-2835-5878 또는 xxxAskillOfGodxxx@gmail.com으로 연락 주세요.
+    </p>
+  </div>
+</div>
+
+<!-- ══════════ 질문지 화면 ══════════ -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="logo">
+      <svg viewBox="0 0 206 156.5" aria-label="ASOG"><path fill="currentColor" transform="translate(-100 -191.8516)" d="M 182.105469 192.21875 L 208.84375 192.054688 C 214.707031 192.023438 221.671875 191.851562 227.4375 192.34375 C 229.984375 194.890625 238.457031 212.917969 240.632812 217.242188 L 257.957031 251.289062 L 291.101562 316.398438 C 294.722656 323.558594 304.53125 340.863281 306 347.746094 C 290.953125 347.527344 275.644531 348.308594 260.5625 347.859375 C 258.621094 347.800781 256.699219 347.652344 254.765625 347.464844 C 253.019531 344.929688 249.984375 338.578125 248.535156 335.554688 C 245.238281 328.679688 242.238281 322.019531 238.660156 315.25 C 234.820312 315.757812 231.878906 316.945312 228.308594 318.378906 C 223.046875 320.789062 218.21875 321.585938 212.984375 323.558594 L 167.554688 340.570312 C 163.425781 342.089844 151.210938 347.234375 147.476562 347.457031 C 132.484375 348.347656 115.015625 347.667969 100 347.804688 C 108.871094 329.621094 118.605469 311.1875 127.679688 293.101562 L 178.039062 192.714844 C 178.925781 192.511719 181.109375 192.328125 182.105469 192.21875 Z M 172.667969 301.621094 C 182.664062 301.445312 192.992188 301.992188 203.046875 301.828125 C 210.34375 301.828125 225.570312 302.132812 232.296875 301.238281 C 226.097656 285.265625 217.566406 270.214844 210.613281 254.539062 C 210.042969 253.253906 203.351562 239.644531 203.089844 239.484375 C 193.257812 256.480469 186.019531 276.074219 176.691406 293.441406 C 175.398438 295.847656 173.710938 299.136719 172.667969 301.621094 Z"/></svg>
+      <span>ASOG · 고객 전용</span>
+    </div>
+    <span class="save-state" id="save-state">불러오는 중</span>
+    <span class="who" id="who"></span>
+    <button class="linkbtn" id="logout">나가기</button>
+  </header>
+  <div class="bar"><i id="bar"></i></div>
+
+  <div class="shell">
+    <nav class="side" aria-label="단계">
+      <ol id="side"></ol>
+    </nav>
+    <main class="main">
+      <p class="step-h" id="step-h"></p>
+      <h2 id="step-t"></h2>
+      <p class="intro" id="step-i"></p>
+      <div class="qs" id="qs"></div>
+      <div id="done-slot"></div>
+      <div class="nav">
+        <button class="btn ghost sm" id="prev">← 이전</button>
+        <span class="sp"></span>
+        <button class="btn sm" id="next" style="width:auto">다음 →</button>
+      </div>
+    </main>
+  </div>
+  <p class="foot">ASOG · 작성하신 내용은 자동으로 저장됩니다</p>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   설정 — Supabase 프로젝트를 만든 뒤 이 두 줄만 채우면
+   실제 로그인과 저장이 켜집니다. 비워두면 체험 모드입니다.
+   ═══════════════════════════════════════════════════════ */
+var SUPABASE_URL = "";
+var SUPABASE_KEY = "";
+
+/* ═══════════════ 질문지 내용 ═══════════════
+   질문을 고치실 때는 아래만 손보시면 됩니다.
+   type: text | tel | email | url | long | one | many
+   req: true 인 것만 필수입니다.                        */
+var STEPS = [
+{
+  id:"basic", n:"01", title:"기본 정보", head:"먼저 <b>연락할 곳</b>부터",
+  intro:"진행 중에 누구와 무엇을 확인하면 되는지 정하는 부분입니다.",
+  qs:[
+    {id:"company", type:"text", req:true, label:"회사·단체명", ph:"주식회사 어소그"},
+    {id:"name", type:"text", req:true, label:"작성하시는 분 성함과 직함", ph:"정영철 / 대표"},
+    {id:"phone", type:"tel", req:true, label:"연락처", ph:"010-0000-0000"},
+    {id:"email2", type:"email", label:"업무용 이메일", help:"접속에 쓰신 주소와 다르면 적어주세요."},
+    {id:"decider", type:"text", label:"최종 결정은 누가 하시나요?", ph:"대표님 / 팀장님 / 제가 합니다",
+     help:"중간에 확인이 필요할 때 누구에게 물어야 하는지 알면 진행이 빨라집니다."},
+    {id:"channel", type:"one", label:"연락은 어떤 방법이 편하신가요?",
+     opts:["카카오톡","전화","이메일","상관없음"]}
+  ]
+},
+{
+  id:"now", n:"02", title:"지금 상황", head:"지금 <b>무엇이 불편하신가요</b>",
+  intro:"고치고 싶은 것보다 지금 겪고 계신 일을 그대로 적어주시면 됩니다. 정리하는 건 저희가 합니다.",
+  qs:[
+    {id:"current_url", type:"url", label:"지금 쓰고 계신 사이트나 시스템 주소", ph:"https://",
+     help:"없으면 비워두셔도 됩니다."},
+    {id:"pain", type:"long", req:true, label:"가장 불편한 것 하나를 적어주세요",
+     help:"예 — 견적서를 매번 엑셀에서 다시 만듭니다 / 홈페이지 주소를 알려주기가 망설여집니다",
+     ph:"떠오르는 대로 적어주세요. 문장이 다듬어지지 않아도 괜찮습니다."},
+    {id:"pain_more", type:"long", label:"그 밖에 불편한 것이 더 있다면"},
+    {id:"since", type:"one", label:"언제부터 그러셨나요?",
+     opts:["최근 몇 달","1년쯤","몇 년째","처음부터 그랬습니다"]},
+    {id:"tried", type:"long", label:"해결해 보려고 시도하신 것이 있나요?",
+     help:"이미 해보신 방법을 알면 같은 제안을 반복하지 않습니다."}
+  ]
+},
+{
+  id:"goal", n:"03", title:"이루고 싶은 것", head:"끝나면 <b>무엇이 달라져야</b> 하나요",
+  intro:"이 답이 프로젝트의 기준이 됩니다. 나중에 판단이 갈릴 때 여기로 돌아옵니다.",
+  qs:[
+    {id:"goal_main", type:"long", req:true, label:"이 프로젝트가 끝나면 무엇이 달라져 있어야 할까요?",
+     ph:"예 — 문의가 한 곳으로 모여서 놓치지 않았으면 합니다"},
+    {id:"success", type:"long", label:"무엇을 보면 잘 됐다고 판단하시겠어요?",
+     help:"숫자가 아니어도 됩니다. 느낌으로 적으셔도 좋습니다."},
+    {id:"must_avoid", type:"long", label:"반대로, 이렇게 되면 실패라고 느끼실 것은?"}
+  ]
+},
+{
+  id:"users", n:"04", title:"쓰는 사람", head:"누가 <b>이걸 쓰게</b> 되나요",
+  intro:"화면을 누구 기준으로 만들지 정하는 부분입니다.",
+  qs:[
+    {id:"who_use", type:"many", label:"주로 누가 사용하나요?",
+     opts:["외부 고객","우리 직원","대표 본인","협력 업체","아직 모르겠습니다"]},
+    {id:"user_desc", type:"long", label:"그분들은 어떤 상황에서 들어오나요?",
+     help:"예 — 소개를 받고 회사를 확인하러 / 주문 상태를 확인하러"},
+    {id:"user_pain", type:"long", label:"그분들이 지금 겪고 있는 어려움이 있다면"},
+    {id:"device", type:"one", label:"주로 어떤 기기로 보시나요?",
+     opts:["휴대폰이 대부분","컴퓨터가 대부분","반반","모르겠습니다"]}
+  ]
+},
+{
+  id:"flow", n:"05", title:"지금 일하는 방식", head:"지금은 <b>어떤 순서로</b> 하시나요",
+  intro:"자동화나 시스템을 만들 때 가장 중요한 부분입니다. 자세할수록 좋습니다.",
+  qs:[
+    {id:"steps", type:"long", label:"일이 들어와서 끝날 때까지의 순서를 적어주세요",
+     help:"예 — 카톡으로 문의가 옴 → 엑셀에 옮겨 적음 → 견적서를 만듦 → 메일로 보냄",
+     ph:"화살표로 이어서 적어주셔도 좋습니다."},
+    {id:"stuck", type:"long", label:"그중 어디에서 가장 막히나요?"},
+    {id:"tools", type:"many", label:"지금 쓰고 계신 도구를 골라주세요",
+     opts:["엑셀·구글 시트","카카오톡","이메일","네이버 폼·구글 폼","전용 프로그램","노션","종이·수기","기타"]},
+    {id:"tools_etc", type:"text", label:"기타를 고르셨다면 무엇인가요?"},
+    {id:"volume", type:"text", label:"하루 또는 한 달에 몇 건 정도 되나요?",
+     ph:"대략이면 됩니다", help:"규모에 따라 만드는 방식이 달라집니다."}
+  ]
+},
+{
+  id:"scope", n:"06", title:"범위와 우선순위", head:"이번에 <b>어디까지</b> 할까요",
+  intro:"한꺼번에 다 만들면 오래 걸리고 비싸집니다. 무엇을 먼저 할지 나누는 것이 이 질문의 목적입니다.",
+  qs:[
+    {id:"must", type:"long", req:true, label:"이것만은 꼭 있어야 한다 — 하나만 고른다면?"},
+    {id:"nice", type:"long", label:"있으면 좋지만 없어도 되는 것"},
+    {id:"later", type:"long", label:"이번엔 안 해도 되는 것",
+     help:"미룰 것을 정해주시면 일정과 비용이 크게 줄어듭니다."},
+    {id:"kind", type:"many", label:"필요하신 것에 가까운 것을 골라주세요",
+     opts:["홈페이지","웹서비스·첫 제품","업무 자동화","AI 업무 도구","아직 모르겠습니다"]}
+  ]
+},
+{
+  id:"taste", n:"07", title:"참고와 취향", head:"어떤 <b>느낌</b>이었으면 하나요",
+  intro:"말로 설명하기 어려운 부분이라, 실제 사이트를 알려주시는 게 가장 정확합니다.",
+  qs:[
+    {id:"ref1", type:"text", label:"좋아 보이는 사이트 1", ph:"주소와 함께, 어떤 점이 좋은지"},
+    {id:"ref2", type:"text", label:"좋아 보이는 사이트 2"},
+    {id:"ref3", type:"text", label:"좋아 보이는 사이트 3"},
+    {id:"avoid", type:"long", label:"이런 느낌은 피하고 싶다",
+     help:"예 — 너무 딱딱한 / 싸 보이는 / 정보가 너무 많은"},
+    {id:"tone", type:"many", label:"우리 회사를 표현한다면?",
+     opts:["신뢰감 있는","전문적인","친근한","젊고 감각적인","차분한","활기찬"]}
+  ]
+},
+{
+  id:"assets", n:"08", title:"자료와 일정", head:"가지고 계신 <b>자료와 일정</b>",
+  intro:"자료가 없어도 진행할 수 있습니다. 무엇이 없는지 미리 알면 일정을 정확히 잡을 수 있습니다.",
+  qs:[
+    {id:"have", type:"many", label:"지금 가지고 계신 것을 골라주세요",
+     opts:["로고 원본 파일","회사 소개 글","제품·서비스 사진","기존 홈페이지 자료","브랜드 가이드","없습니다"]},
+    {id:"when", type:"one", label:"언제쯤 완료되기를 원하시나요?",
+     opts:["1개월 이내","2~3개월","올해 안","급하지 않습니다"]},
+    {id:"fixed_date", type:"text", label:"반드시 지켜야 할 날짜가 있나요?",
+     ph:"예 — 11월 전시회 전까지", help:"행사나 오픈 일정이 있으면 알려주세요."},
+    {id:"approval", type:"text", label:"내부에서 승인 절차가 있나요?",
+     ph:"예 — 본부장 결재 후 진행", help:"확인에 며칠 걸리는지 알면 일정에 미리 반영합니다."},
+    {id:"domain", type:"one", label:"도메인(사이트 주소)을 가지고 계신가요?",
+     opts:["있습니다","없습니다","있는데 관리자를 모릅니다"]}
+  ]
+},
+{
+  id:"free", n:"09", title:"자유롭게", head:"그 밖에 <b>하고 싶으신 말씀</b>",
+  intro:"위에서 묻지 않았지만 알아두면 좋을 것이 있다면 적어주세요.",
+  qs:[
+    {id:"anything", type:"long", label:"자유롭게 적어주세요", ph:"짧아도 괜찮습니다."},
+    {id:"worry", type:"long", label:"외주를 맡기실 때 걱정되는 점이 있다면",
+     help:"이전에 안 좋았던 경험이 있으시면 그 부분을 특히 신경 쓰겠습니다."}
+  ]
+}
+];
+
+/* ═══════════════ 여기부터는 동작 코드 ═══════════════ */
+(function(){
+  var DEMO = !SUPABASE_URL || !SUPABASE_KEY;
+  var sb = null, user = null, answers = {}, cur = 0, saveTimer = null, submitted = false;
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ── 로그인 ── */
+  $("login-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var email = $("email").value.trim();
+    if(!email || email.indexOf("@") < 1){ return note("err", "이메일 주소를 확인해 주세요."); }
+    if(DEMO){
+      note("ok", "체험 모드입니다. 실제로는 이 주소로 접속 링크가 발송됩니다. 잠시 후 질문지가 열립니다.");
+      setTimeout(function(){ user = { email: email }; openApp(); }, 900);
+      return;
+    }
+    $("login-btn").disabled = true;
+    $("login-btn").textContent = "보내는 중…";
+    sb.auth.signInWithOtp({ email: email, options: { emailRedirectTo: location.href } })
+      .then(function(r){
+        $("login-btn").disabled = false;
+        $("login-btn").textContent = "접속 링크 받기";
+        if(r.error){ return note("err", "보내지 못했습니다. 등록된 주소인지 확인해 주세요."); }
+        note("ok", email + " 으로 접속 링크를 보냈습니다. 메일함을 확인해 주세요. 링크는 한 시간 동안 유효합니다.");
+      });
+  });
+  function note(kind, text){
+    $("login-msg").innerHTML = '<div class="msg ' + kind + '">' + text + '</div>';
+  }
+
+  $("logout").addEventListener("click", function(){
+    if(!DEMO && sb){ sb.auth.signOut(); }
+    location.reload();
+  });
+
+  /* ── 화면 전환 ── */
+  function openApp(){
+    $("gate").hidden = true;
+    $("app").hidden = false;
+    $("who").textContent = user.email;
+    load().then(function(){ render(); });
+  }
+
+  /* ── 저장·불러오기 ── */
+  function load(){
+    if(DEMO){ setSave("saved"); return Promise.resolve(); }
+    return sb.from("project_briefs").select("answers, submitted_at").eq("user_id", user.id).maybeSingle()
+      .then(function(r){
+        if(r.data){ answers = r.data.answers || {}; submitted = !!r.data.submitted_at; }
+        setSave("saved");
+      });
+  }
+  function queueSave(){
+    setSave("saving");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(save, 900);
+  }
+  function save(){
+    if(DEMO){ return setSave("saved"); }
+    sb.from("project_briefs").upsert({
+      user_id: user.id, email: user.email, answers: answers, updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" }).then(function(r){
+      setSave(r.error ? "err" : "saved");
+    });
+  }
+  function setSave(state){
+    var el = $("save-state");
+    el.className = "save-state " + (state === "err" ? "" : state);
+    el.textContent = state === "saving" ? "저장 중" :
+                     state === "saved"  ? "저장됨" : "저장 실패 — 다시 시도합니다";
+    if(state === "err"){ setTimeout(save, 3000); }
+  }
+
+  /* ── 그리기 ── */
+  function render(){
+    var s = STEPS[cur];
+    $("step-h").textContent = s.n + " / " + STEPS.length + "  ·  " + s.title;
+    $("step-t").innerHTML = s.head;
+    $("step-i").textContent = s.intro;
+    $("qs").innerHTML = s.qs.map(qHtml).join("");
+    bindInputs();
+    renderSide();
+    renderDone();
+    $("prev").style.visibility = cur === 0 ? "hidden" : "visible";
+    $("next").textContent = cur === STEPS.length - 1 ? "다 적었습니다" : "다음 →";
+    updateBar();
+    window.scrollTo(0, 0);
+  }
+
+  function updateBar(){
+    var filled = STEPS.reduce(function(a, st){ return a + (stepDone(st) ? 1 : 0); }, 0);
+    $("bar").style.width = Math.round(filled / STEPS.length * 100) + "%";
+  }
+
+  function qHtml(q){
+    var v = answers[q.id];
+    var head = '<span class="lab">' + q.label +
+      (q.req ? '<span class="req">필수</span>' : '') + '</span>' +
+      (q.help ? '<p class="help">' + q.help + '</p>' : '');
+    var body;
+    if(q.type === "long"){
+      body = '<textarea data-q="' + q.id + '" placeholder="' + (q.ph || "") + '">' + esc(v || "") + '</textarea>';
+    } else if(q.type === "one" || q.type === "many"){
+      var many = q.type === "many";
+      var set = many ? (v || []) : v;
+      body = '<div class="opts">' + q.opts.map(function(o){
+        var on = many ? set.indexOf(o) > -1 : set === o;
+        return '<label class="opt' + (on ? ' on' : '') + '">' +
+          '<input type="' + (many ? "checkbox" : "radio") + '" name="' + q.id + '" value="' + esc(o) + '"' +
+          ' data-q="' + q.id + '" data-many="' + many + '"' + (on ? " checked" : "") + '>' + o + '</label>';
+      }).join("") + '</div>';
+    } else {
+      body = '<input type="' + q.type + '" data-q="' + q.id + '" value="' + esc(v || "") +
+             '" placeholder="' + (q.ph || "") + '">';
+    }
+    return '<div class="q">' + head + body + '</div>';
+  }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function bindInputs(){
+    var box = $("qs");
+    box.querySelectorAll("input[type=text],input[type=tel],input[type=email],input[type=url],textarea")
+      .forEach(function(el){
+        el.addEventListener("input", function(){
+          answers[el.dataset.q] = el.value;
+          queueSave();
+          renderSide();
+          updateBar();
+        });
+      });
+    box.querySelectorAll("input[type=radio],input[type=checkbox]").forEach(function(el){
+      el.addEventListener("change", function(){
+        var q = el.dataset.q;
+        if(el.dataset.many === "true"){
+          var picked = [];
+          box.querySelectorAll('input[data-q="' + q + '"]:checked').forEach(function(c){ picked.push(c.value); });
+          answers[q] = picked;
+        } else {
+          answers[q] = el.value;
+        }
+        box.querySelectorAll('input[data-q="' + q + '"]').forEach(function(c){
+          c.closest(".opt").classList.toggle("on", c.checked);
+        });
+        queueSave();
+        renderSide();
+        updateBar();
+      });
+    });
+  }
+
+  function stepDone(s){
+    return s.qs.some(function(q){
+      var v = answers[q.id];
+      return Array.isArray(v) ? v.length > 0 : !!(v && String(v).trim());
+    });
+  }
+
+  function renderSide(){
+    $("side").innerHTML = STEPS.map(function(s, i){
+      return '<li><button data-i="' + i + '"' +
+        (i === cur ? ' aria-current="true"' : '') +
+        (stepDone(s) ? ' class="done"' : '') + '>' +
+        '<span class="n">' + s.n + '</span>' + s.title + '<span class="dot"></span></button></li>';
+    }).join("");
+    $("side").querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){ cur = +b.dataset.i; render(); });
+    });
+  }
+
+  function renderDone(){
+    if(cur !== STEPS.length - 1){ $("done-slot").innerHTML = ""; return; }
+    var missing = [];
+    STEPS.forEach(function(s){
+      s.qs.forEach(function(q){
+        if(q.req){
+          var v = answers[q.id];
+          if(!(Array.isArray(v) ? v.length : (v && String(v).trim()))){ missing.push(s.title + " — " + q.label); }
+        }
+      });
+    });
+    $("done-slot").innerHTML = '<div class="done-card">' +
+      '<h3>' + (missing.length ? "아직 비어 있는 필수 항목이 있습니다" : "여기까지 하시면 충분합니다") + '</h3>' +
+      (missing.length
+        ? '<p>아래 항목만 채워주시면 됩니다.</p><p>· ' + missing.join('<br>· ') + '</p>'
+        : '<p>작성하신 내용은 이미 저장되어 있습니다. 창을 닫으셔도 되고, 나중에 다시 들어오셔서 고치셔도 됩니다.</p>' +
+          '<p>다 적으셨다면 아래 버튼을 눌러주세요. 저희가 확인하고 하루 안에 연락드립니다. 누르신 뒤에도 수정은 계속 가능합니다.</p>' +
+          '<p style="margin-top:20px"><button class="btn sm" id="submit-btn">작성 완료 알리기</button></p>') +
+      '</div>';
+    var sbtn = $("submit-btn");
+    if(sbtn){
+      if(submitted){ sbtn.textContent = "알림 보냄 ✓"; sbtn.disabled = true; }
+      sbtn.addEventListener("click", function(){
+        submitted = true;
+        sbtn.textContent = "알림 보냄 ✓";
+        sbtn.disabled = true;
+        if(!DEMO){
+          sb.from("project_briefs").update({ submitted_at: new Date().toISOString() })
+            .eq("user_id", user.id).then(function(){});
+        }
+      });
+    }
+  }
+
+  $("prev").addEventListener("click", function(){ if(cur > 0){ cur--; render(); } });
+  $("next").addEventListener("click", function(){ if(cur < STEPS.length - 1){ cur++; render(); } });
+
+  /* ── 시작 ── */
+  if(DEMO){
+    note("ok", "체험 모드입니다. 아무 이메일이나 넣고 눌러보시면 질문지가 열립니다. 저장은 이 창에서만 유지됩니다.");
+  } else {
+    var tag = document.createElement("script");
+    tag.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    tag.onload = function(){
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      sb.auth.getSession().then(function(r){
+        if(r.data && r.data.session){ user = r.data.session.user; openApp(); }
+      });
+      sb.auth.onAuthStateChange(function(ev, session){
+        if(session && !user){ user = session.user; openApp(); }
+      });
+    };
+    document.head.appendChild(tag);
+  }
+})();
+</script>
+</body>
+</html>
