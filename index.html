@@ -96,6 +96,30 @@ input::placeholder,textarea::placeholder{color:#9AA4B8}
 .main h2 b{font-weight:700}
 .main .intro{margin-top:14px;color:var(--ink-2);font-size:17px;max-width:56ch}
 .qs{margin-top:38px}
+.warn{margin-top:22px;padding:18px 20px;border-radius:5px;
+  background:#FFF3CD;color:#6B4E00;box-shadow:inset 0 0 0 1px #F0DFA8;
+  font-size:17px;line-height:1.65;max-width:62ch}
+.warn b{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;margin-bottom:6px;font-weight:700}
+.warn strong{font-weight:800}
+.ref{margin-top:40px;padding:24px;border-radius:5px;background:var(--panel);
+  box-shadow:inset 0 0 0 1px var(--rule-soft)}
+.ref h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-2);margin:0 0 14px;font-weight:600}
+.ref .scroll{overflow-x:auto}
+.ref table{border-collapse:collapse;width:100%;min-width:520px;font-size:15px;line-height:1.5}
+.ref th,.ref td{text-align:left;padding:10px 14px 10px 0;border-bottom:1px solid var(--rule-soft);
+  vertical-align:top;white-space:nowrap}
+.ref th{font-size:13px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.ref td:first-child{white-space:normal;min-width:150px}
+.ref tr:last-child td{border-bottom:0}
+.ref .now{color:var(--brand);font-weight:700}
+.ref .y{color:var(--brand);font-weight:700}
+.ref .n{color:#B4BCCB;font-weight:700}
+.ref .p{color:#B07800;font-weight:700}
+.ref td em{font-style:normal;color:var(--ink-2);font-weight:400;margin-left:4px;font-size:14px}
+.ref col.hl{background:var(--pale)}
+.ref p{margin-top:14px;font-size:16px;line-height:1.65;color:var(--ink-2)}
 .q{padding:26px 0;border-top:1px solid var(--rule-soft)}
 .q:first-child{border-top:0;padding-top:8px}
 .q .lab{display:block;font-size:19px;font-weight:600;line-height:1.5;margin-bottom:6px}
@@ -187,7 +211,9 @@ input::placeholder,textarea::placeholder{color:#9AA4B8}
       <p class="step-h" id="step-h"></p>
       <h2 id="step-t"></h2>
       <p class="intro" id="step-i"></p>
+      <div id="step-w"></div>
       <div class="qs" id="qs"></div>
+      <div id="step-r"></div>
       <div id="done-slot"></div>
       <div class="nav">
         <button class="btn ghost sm" id="prev">← 이전</button>
@@ -300,6 +326,8 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
     $("step-h").textContent = s._mod + "  ·  " + s.title + "  ·  " + (cur + 1) + " / " + STEPS.length;
     $("step-t").innerHTML = s.head;
     $("step-i").textContent = s.intro;
+    $("step-w").innerHTML = s.warn ? '<p class="warn"><b>주의</b>' + s.warn + '</p>' : "";
+    $("step-r").innerHTML = s.ref || "";
     $("qs").innerHTML = s.qs.map(qHtml).join("");
     bindInputs();
     renderSide();
