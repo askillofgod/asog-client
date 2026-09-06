@@ -222,8 +222,14 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
       });
   }
 
+  function baseUrl(){
+    // Cloudflare Pages는 /admin.html 을 /admin 으로 바꿔 보여주기도 해서 둘 다 잘라낸다
+    var p = location.pathname.replace(/\/admin(\.html)?\/?$/, "/");
+    if(p.charAt(p.length - 1) !== "/") p += "/";
+    return location.origin + p;
+  }
   function linkFor(row){
-    return location.origin + location.pathname.replace(/admin\.html$/, "") + "?k=" + row.access_key;
+    return baseUrl() + "?k=" + row.access_key;
   }
   function answered(row){
     var a = row.answers || {}, n = 0;
@@ -286,7 +292,7 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
           $("mkmsg").innerHTML = '<div class="msg err">' + esc((r.error && r.error.message) || "추가하지 못했습니다.") + '</div>';
           return;
         }
-        var url = location.origin + location.pathname.replace(/admin\.html$/, "") + "?k=" + r.data;
+        var url = baseUrl() + "?k=" + r.data;
         $("mkmsg").innerHTML = '<div class="linkbox"><b>' + esc(co) + ' 링크가 만들어졌습니다.</b>' +
           '<code>' + esc(url) + '</code>' +
           '<button class="btn sm ghost" id="newopen" style="margin-top:6px">고객 입력 페이지 열기 ↗</button>' +
