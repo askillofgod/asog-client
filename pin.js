@@ -122,14 +122,34 @@
     '*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic","맑은 고딕",sans-serif}',
     '.layer{position:absolute;inset:0;pointer-events:none}',
 
-    /* 핀 */
-    '.pin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50% 50% 50% 2px;',
+    /* 핀 — 고칠 자리를 크게 표시합니다 */
+    '.pin{position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50% 50% 50% 4px;',
     ' transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;',
-    ' color:#fff;font-size:12px;font-weight:700;cursor:pointer;pointer-events:auto;',
-    ' box-shadow:0 2px 8px rgba(0,0,0,.3);border:2px solid #fff;transition:transform .12s}',
-    '.pin span{transform:rotate(45deg)}',
-    '.pin:hover{transform:rotate(-45deg) scale(1.18)}',
-    '.pin.sel{outline:3px solid rgba(0,64,200,.35);outline-offset:2px}',
+    ' background:var(--c);color:#fff;font-size:16px;font-weight:800;cursor:pointer;pointer-events:auto;',
+    ' box-shadow:0 4px 14px rgba(0,0,0,.34);border:3px solid #fff;transition:transform .14s}',
+    '.pin span{transform:rotate(45deg);letter-spacing:-.02em}',
+    '.pin::before{content:"";position:absolute;inset:-10px;border-radius:inherit;',
+    ' border:2px solid var(--c);opacity:.32;pointer-events:none}',
+    '.pin:hover{transform:rotate(-45deg) scale(1.14)}',
+    '.pin.sel{animation:asogpulse 1s ease-out 2}',
+    '@keyframes asogpulse{0%{transform:rotate(-45deg) scale(1)}',
+    ' 45%{transform:rotate(-45deg) scale(1.32)}100%{transform:rotate(-45deg) scale(1)}}',
+
+    /* 그 핀이 가리키는 영역을 네모로 감싸 보여줍니다 */
+    '.box{position:absolute;border:2.5px dashed var(--c);border-radius:6px;pointer-events:none;',
+    ' background:rgba(0,64,200,.07);opacity:0;transition:opacity .15s}',
+    '@supports (background:color-mix(in srgb,#000 9%,transparent)){',
+    ' .box{background:color-mix(in srgb, var(--c) 9%, transparent)}}',
+    '.box.on{opacity:1}',
+
+    /* 핀을 찍는 동안 마우스가 올라간 영역을 미리 보여줍니다 */
+    '.hbox{position:absolute;border:2.5px solid ' + BRAND + ';border-radius:6px;pointer-events:none;',
+    ' background:rgba(0,64,200,.10);opacity:0;transition:opacity .1s}',
+    '.hbox.on{opacity:1}',
+    '.hbox b{position:absolute;left:-2.5px;top:-25px;background:' + BRAND + ';color:#fff;font-size:12px;',
+    ' font-weight:700;padding:3px 9px;border-radius:5px 5px 5px 0;white-space:nowrap;line-height:1.4}',
+    '.box b{position:absolute;left:-2.5px;top:-25px;background:var(--c);color:#fff;font-size:12px;',
+    ' font-weight:700;padding:3px 9px;border-radius:5px 5px 5px 0;white-space:nowrap;line-height:1.4}',
 
     /* 아래 고정 버튼 */
     '.fab{position:fixed;right:18px;bottom:18px;pointer-events:auto;display:flex;gap:8px;align-items:center}',
@@ -144,7 +164,8 @@
     /* 안내 띠 */
     '.tip{position:fixed;left:50%;top:16px;transform:translateX(-50%);pointer-events:auto;',
     ' background:#0C2141;color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;',
-    ' box-shadow:0 6px 20px rgba(12,33,65,.28);display:flex;gap:14px;align-items:center}',
+    ' box-shadow:0 6px 20px rgba(12,33,65,.28);display:flex;gap:14px;align-items:center;',
+    ' border:1.5px solid rgba(255,255,255,.28)}',
     '.tip b{font-weight:700}',
     '.tip u{cursor:pointer;text-decoration:underline;opacity:.8;font-size:13px}',
 
@@ -180,8 +201,15 @@
     '.it .rep{margin-top:8px;padding:9px 11px;background:#EAF1FF;border-radius:7px;font-size:13.5px;',
     ' line-height:1.55;color:#0C2141;white-space:pre-wrap}',
     '.it .rep b{display:block;font-size:11px;letter-spacing:.06em;color:' + BRAND + ';margin-bottom:3px}',
-    '.it .acts{margin-top:8px;display:flex;gap:12px}',
-    '.it .acts a{font-size:12.5px;color:#7A8395;text-decoration:underline;cursor:pointer}',
+    '.it .acts{margin-top:10px;display:flex;gap:8px}',
+    '.it .acts a{display:inline-flex;align-items:center;justify-content:center;',
+    ' padding:8px 16px;border-radius:7px;font-size:13.5px;font-weight:600;line-height:1;',
+    ' background:#fff;color:#0C2141;border:1.5px solid #D5DCE8;cursor:pointer;',
+    ' text-decoration:none;transition:background .12s,border-color .12s}',
+    '.it .acts a:hover{background:#F1F4F9;border-color:#AEBCD2}',
+    '.it .acts a:active{transform:translateY(1px)}',
+    '.it .acts a[data-act="del"]{color:#C8102E;border-color:#EFD3D8}',
+    '.it .acts a[data-act="del"]:hover{background:#FDECEF;border-color:#E0A9B3}',
     '.it .lost{margin-top:6px;font-size:12px;color:#B07800}',
     '.empty{padding:34px 20px;text-align:center;color:#8A93A3;font-size:14px;line-height:1.7}',
     '.pf{padding:12px 18px;border-top:1px solid #E9EDF4;font-size:12px;color:#8A93A3;line-height:1.6}',
@@ -229,13 +257,38 @@
   function setPlacing(on) {
     placing = on;
     document.documentElement.style.cursor = on ? "crosshair" : "";
-    if (on) { closePanel(); closePop(); }
+    if (on) { closePanel(); closePop(); hideBox(); }
+    else if (hbox) hbox.classList.remove("on");
     renderFab();
   }
 
   /* ── 핀 그리기 ───────────────────────────────────────── */
+  // 핀이 가리키는 영역을 감싸는 네모. 핀에 마우스를 올리거나
+  // 목록에서 항목을 누르면 어디를 말하는지 한눈에 보입니다.
+  var boxEl = null, boxTimer = null;
+  function showBox(it, hold) {
+    var el = findEl(it.selector);
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    if (!r.width && !r.height) return;
+    var st = STATUS[it.status] || STATUS["new"];
+    if (!boxEl) { boxEl = document.createElement("div"); boxEl.className = "box"; layer.appendChild(boxEl); }
+    boxEl.style.setProperty("--c", st.color);
+    boxEl.style.left = (r.left - 4) + "px";
+    boxEl.style.top = (r.top - 4) + "px";
+    boxEl.style.width = (r.width + 8) + "px";
+    boxEl.style.height = (r.height + 8) + "px";
+    boxEl.innerHTML = '<b' + (r.top < 32 ? ' style="top:4px;border-radius:5px"' : '') +
+                      '>#' + it.num + " 여기</b>";
+    boxEl.classList.add("on");
+    clearTimeout(boxTimer);
+    if (hold) boxTimer = setTimeout(hideBox, 2600);
+  }
+  function hideBox() { if (boxEl) boxEl.classList.remove("on"); }
+
   function renderPins() {
     layer.innerHTML = "";
+    boxEl = null; hbox = null;
     items.forEach(function (it) {
       if (it.path !== pathNow()) return;
       var pt = pointOf(it);
@@ -243,12 +296,14 @@
       var st = STATUS[it.status] || STATUS["new"];
       var el = document.createElement("div");
       el.className = "pin";
-      el.style.background = st.color;
+      el.style.setProperty("--c", st.color);
       el.style.left = (pt.x - window.pageXOffset) + "px";
       el.style.top = (pt.y - window.pageYOffset) + "px";
       el.title = "#" + it.num + " · " + st.label;
       el.innerHTML = "<span>" + it.num + "</span>";
-      el.onclick = function (e) { e.stopPropagation(); openPanel(true, it.id); };
+      el.onmouseenter = function () { showBox(it); };
+      el.onmouseleave = hideBox;
+      el.onclick = function (e) { e.stopPropagation(); showBox(it, true); openPanel(true, it.id); };
       layer.appendChild(el);
     });
   }
@@ -417,14 +472,15 @@
     closePanel();
     window.scrollTo({ top: Math.max(0, pt.y - window.innerHeight / 2), behavior: "smooth" });
     setTimeout(function () {
+      showBox(it, true);
       var pins = layer.querySelectorAll(".pin");
       for (var i = 0; i < pins.length; i++) {
         if (pins[i].textContent === String(it.num)) { pins[i].classList.add("sel"); break; }
       }
       setTimeout(function () {
         layer.querySelectorAll(".pin.sel").forEach(function (p) { p.classList.remove("sel"); });
-      }, 2000);
-    }, 420);
+      }, 2400);
+    }, 480);
   }
 
   /* ── 페이지 클릭 잡기 ────────────────────────────────── */
@@ -446,6 +502,27 @@
     };
     setPlacing(false);
     openPop(draft);
+  }, true);
+
+  // 핀 찍기 모드에서 마우스가 가리키는 영역을 미리 보여줍니다
+  var hbox = null;
+  function hoverOff() { if (hbox) hbox.classList.remove("on"); }
+  document.addEventListener("mousemove", function (e) {
+    if (!placing) return hoverOff();
+    if (e.target === host || host.contains(e.target)) return hoverOff();
+    var el = e.target;
+    while (el && el.nodeType !== 1) el = el.parentNode;
+    if (!el || el === document.documentElement) return hoverOff();
+    var r = el.getBoundingClientRect();
+    if (!r.width && !r.height) return hoverOff();
+    if (!hbox) { hbox = document.createElement("div"); hbox.className = "hbox"; layer.appendChild(hbox); }
+    hbox.style.left = (r.left - 3) + "px";
+    hbox.style.top = (r.top - 3) + "px";
+    hbox.style.width = (r.width + 6) + "px";
+    hbox.style.height = (r.height + 6) + "px";
+    hbox.innerHTML = '<b' + (r.top < 32 ? ' style="top:4px;border-radius:5px"' : '') +
+                     '>여기를 고칠까요?</b>';
+    hbox.classList.add("on");
   }, true);
 
   document.addEventListener("keydown", function (e) {
