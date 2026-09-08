@@ -113,6 +113,41 @@ input:focus{border-color:var(--brand);outline:none}
 .linkbox code{display:block;font-family:var(--mono);font-size:13px;word-break:break-all;
   margin:8px 0;line-height:1.6}
 .linkbox p{margin:0;line-height:1.6}
+
+/* ── 수정 요청 ── */
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tabs button{flex:1;background:none;border:0;cursor:pointer;padding:10px 8px;border-radius:5px;
+  font-size:15px;font-weight:600;color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--rule-soft)}
+.tabs button[aria-current="true"]{background:var(--pale);color:var(--brand);
+  box-shadow:inset 0 0 0 1.5px var(--brand)}
+.filters{display:flex;flex-wrap:wrap;gap:7px;margin:22px 0 4px}
+.filters button{background:var(--ground);border:1.5px solid var(--rule);border-radius:99px;
+  padding:7px 15px;font-size:14px;cursor:pointer;color:var(--ink-2)}
+.filters button[aria-current="true"]{border-color:var(--brand);background:var(--pale);
+  color:var(--brand);font-weight:600}
+.fb{padding:20px 0;border-bottom:1px solid var(--rule-soft)}
+.fb .line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:14px;color:var(--ink-2)}
+.fb .no{font-family:var(--mono);font-weight:600;color:#fff;border-radius:99px;padding:2px 9px;font-size:13px}
+.fb .co{font-weight:700;color:var(--ink);font-size:15px}
+.fb .st{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;border:1.5px solid currentColor}
+.fb .so{font-size:12px;font-weight:700;color:#6B4E00;background:#FFF3CD;border-radius:99px;padding:3px 9px}
+.fb .body{margin-top:9px;font-size:17px;line-height:1.65;white-space:pre-wrap}
+.fb .where{margin-top:7px;font-family:var(--mono);font-size:13px;color:var(--ink-2);word-break:break-all}
+.fb .tools{margin-top:13px;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.fb .tools .seg{display:flex;border-radius:5px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--rule)}
+.fb .tools .seg button{background:var(--ground);border:0;padding:8px 13px;font-size:14px;cursor:pointer;
+  color:var(--ink-2);border-right:1px solid var(--rule-soft)}
+.fb .tools .seg button:last-child{border-right:0}
+.fb .tools .seg button[aria-current="true"]{background:var(--brand);color:#fff;font-weight:600}
+.fb .tools .txt{background:none;border:0;color:var(--ink-2);font-size:14px;cursor:pointer;
+  text-decoration:underline;padding:8px 4px}
+.fb .rep{margin-top:11px}
+.fb .rep textarea{width:100%;min-height:70px;background:var(--panel);border:1.5px solid var(--rule);
+  border-radius:5px;padding:11px 13px;font:inherit;font-size:15px;line-height:1.6;resize:vertical}
+.fb .rep textarea:focus{border-color:var(--brand);outline:none;background:var(--ground)}
+.fb .rep .save{margin-top:7px}
+.fb.done{opacity:.62}
+
 @media (max-width:900px){
   .shell{grid-template-columns:1fr;gap:0}
   .side{position:static;padding:20px 0 0}
@@ -152,6 +187,10 @@ input:focus{border-color:var(--brand);outline:none}
 
   <div class="shell">
     <nav class="side">
+      <div class="tabs">
+        <button id="tab-a" aria-current="true">고객 답변</button>
+        <button id="tab-f">수정 요청</button>
+      </div>
       <h2 id="cnt">고객</h2>
       <button class="btn sm" id="add" style="width:100%;margin-bottom:14px">+ 고객 추가</button>
       <div id="list"></div>
@@ -173,6 +212,8 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
   })();
 
   var sb = null, rows = [], pick = null, hideEmpty = true;
+  var view = "answers";      // answers | feedback
+  var fbRows = [], fbFilter = "open";
   var $ = function(id){ return document.getElementById(id); };
   function esc(s){ return String(s == null ? "" : s)
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -218,8 +259,43 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
           var still = rows.filter(function(x){ return x.access_key === pick.access_key; })[0];
           pick = still || null;
         }
-        renderList(); renderMain();
+        renderList();
+        if(view === "answers") renderMain();
+        loadFb();
       });
+  }
+
+  function loadFb(){
+    return sb.rpc("admin_fb", { p_key: AKEY }).then(function(r){
+      fbRows = (r && r.data) || [];
+      renderTabs();
+      renderList();
+      if(view === "feedback") renderFb();
+    });
+  }
+
+  function openCount(){
+    return fbRows.filter(function(f){ return f.status !== "done"; }).length;
+  }
+  function renderTabs(){
+    var n = openCount();
+    $("tab-f").textContent = n ? "수정 요청 " + n : "수정 요청";
+  }
+
+  $("tab-a").addEventListener("click", function(){ setView("answers"); });
+  $("tab-f").addEventListener("click", function(){ setView("feedback"); });
+
+  function setView(v){
+    view = v;
+    $("tab-a").setAttribute("aria-current", v === "answers" ? "true" : "false");
+    $("tab-f").setAttribute("aria-current", v === "feedback" ? "true" : "false");
+    if(v === "feedback"){
+      $("main").innerHTML = '<p class="blank">불러오는 중…</p>';
+      loadFb();
+    } else {
+      renderMain();
+    }
+    renderList();
   }
 
   function baseUrl(){
@@ -255,7 +331,12 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
   }
 
   /* ── 고객 추가 ── */
-  $("add").addEventListener("click", function(){ renderAdd(); });
+  $("add").addEventListener("click", function(){
+    view = "answers";
+    $("tab-a").setAttribute("aria-current", "true");
+    $("tab-f").setAttribute("aria-current", "false");
+    renderAdd();
+  });
 
   function renderAdd(){
     pick = null; renderList();
@@ -311,6 +392,8 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
     if(!rows.length){ $("list").innerHTML = '<p class="blank" style="padding:10px 0;font-size:15px">아직 고객이 없습니다.</p>'; return; }
     $("list").innerHTML = rows.map(function(r, i){
       var a = answered(r), t = totalFor(r), pct = Math.round(a / t * 100);
+      var fo = r.fb_key ? fbRows.filter(function(f){
+        return f.fb_key === r.fb_key && f.status !== "done"; }).length : 0;
       return '<button class="cli" data-i="' + i + '"' +
         (pick && pick.access_key === r.access_key ? ' aria-current="true"' : '') + '>' +
         '<div class="co">' + esc(r.company) + '</div>' +
@@ -318,14 +401,204 @@ var SUPABASE_KEY = "sb_publishable_bKsdXn04F_MCXT9YgCiYZg_biJjPRZC";
           (r.submitted_at ? '<span class="pill done">작성 완료</span>' : '<span class="pill ing">작성 중</span>') +
           '<span>' + a + ' / ' + t + '</span></div>' +
         '<div class="mini"><i style="width:' + pct + '%"></i></div>' +
-        '<div class="st"><span>수정 ' + when(r.updated_at) + '</span></div>' +
+        '<div class="st"><span>수정 ' + when(r.updated_at) + '</span>' +
+          (fo ? '<span class="pill ing">요청 ' + fo + '</span>' : '') + '</div>' +
       '</button>';
     }).join("");
     $("list").querySelectorAll(".cli").forEach(function(b){
       b.addEventListener("click", function(){
-        pick = rows[+b.dataset.i]; renderList(); renderMain();
+        var r = rows[+b.dataset.i];
+        pick = (view === "feedback" && pick && pick.access_key === r.access_key) ? null : r;
+        renderList();
+        if(view === "feedback") renderFb(); else renderMain();
       });
     });
+  }
+
+  /* ══════════════ 수정 요청 ══════════════ */
+  var FST = {
+    "new":   { label: "접수",      color: "#0040C8" },
+    "doing": { label: "작업 중",   color: "#B07800" },
+    "done":  { label: "완료",      color: "#0E8A5F" },
+    "hold":  { label: "협의 필요", color: "#7A8395" }
+  };
+  var FILTERS = [
+    { id: "open", label: "진행 중" },
+    { id: "new",  label: "접수" },
+    { id: "doing",label: "작업 중" },
+    { id: "hold", label: "협의 필요" },
+    { id: "done", label: "완료" },
+    { id: "all",  label: "전체" }
+  ];
+
+  // 왼쪽에서 고객을 고르면 그 고객 것만 봅니다
+  function fbBase(){
+    if(!pick) return fbRows;
+    return fbRows.filter(function(f){ return !!pick.fb_key && f.fb_key === pick.fb_key; });
+  }
+  function fbVisible(){
+    return fbBase().filter(function(f){
+      if(fbFilter === "all") return true;
+      if(fbFilter === "open") return f.status !== "done";
+      return f.status === fbFilter;
+    });
+  }
+
+  function renderFb(){
+    var base = fbBase(), list = fbVisible();
+    var head =
+      '<div class="hd"><div>' +
+        '<h1>수정 <b>요청</b></h1>' +
+        '<div class="meta">' +
+          (pick ? esc(pick.company) + ' · ' : '전체 고객 · ') +
+          '진행 중 ' + base.filter(function(x){ return x.status !== "done"; }).length +
+          '건 / 전체 ' + base.length + '건' +
+          (pick ? ' · 왼쪽에서 같은 고객을 다시 누르면 전체가 보입니다' : '') +
+        '</div>' +
+      '</div><div class="acts">' +
+        '<button class="btn sm ghost" id="fbsetup"' +
+          (pick ? '' : ' title="왼쪽에서 고객을 먼저 골라주세요"') +
+          '>개발 사이트에 붙이기</button>' +
+        '<button class="btn sm ghost" id="fbcopy">글로 복사</button>' +
+      '</div></div>' +
+      '<div class="filters">' + FILTERS.map(function(f){
+        var n = f.id === "all" ? base.length
+              : f.id === "open" ? base.filter(function(x){ return x.status !== "done"; }).length
+              : base.filter(function(x){ return x.status === f.id; }).length;
+        return '<button data-f="' + f.id + '"' + (fbFilter === f.id ? ' aria-current="true"' : '') + '>' +
+               f.label + ' ' + n + '</button>';
+      }).join("") + '</div>' +
+      '<div id="fbsetupbox"></div>';
+
+    var body = list.length ? list.map(fbCard).join("") :
+      '<p class="blank">해당하는 수정 요청이 없습니다.<br><br>' +
+      '개발 중인 사이트에 스크립트 한 줄을 넣으면 고객이 화면을 클릭해 요청을 남길 수 있습니다. ' +
+      '왼쪽에서 고객을 고른 뒤 <b>수정 요청 링크 만들기</b>를 눌러보세요.</p>';
+
+    $("main").innerHTML = head + body;
+
+    $("main").querySelectorAll(".filters button").forEach(function(b){
+      b.addEventListener("click", function(){ fbFilter = b.dataset.f; renderFb(); });
+    });
+    $("fbsetup").disabled = !pick;
+    if(pick) $("fbsetup").addEventListener("click", function(){ renderFbSetup(); });
+    $("fbcopy").addEventListener("click", function(){ copyText(fbAsText(list), $("fbcopy"), "글로 복사"); });
+    bindFbCards();
+  }
+
+  function fbCard(f){
+    var st = FST[f.status] || FST["new"];
+    return '<div class="fb' + (f.status === "done" ? " done" : "") + '" data-id="' + f.id + '">' +
+      '<div class="line">' +
+        '<span class="no" style="background:' + st.color + '">#' + f.num + '</span>' +
+        '<span class="co">' + esc(f.company) + '</span>' +
+        '<span class="st" style="color:' + st.color + '">' + st.label + '</span>' +
+        (f.scope_out ? '<span class="so">별도 협의</span>' : '') +
+        '<span>' + (f.author ? esc(f.author) + ' · ' : '') + when(f.created_at) + '</span>' +
+      '</div>' +
+      '<div class="body">' + esc(f.body) + '</div>' +
+      '<div class="where">' + esc(f.path) +
+        ' · ' + (f.device === "mobile" ? "모바일" : "PC") + ' ' + (f.vw || "?") + 'px' +
+        (f.selector ? ' · ' + esc(f.selector) : '') + '</div>' +
+      '<div class="tools">' +
+        '<div class="seg">' + ["new","doing","done","hold"].map(function(s){
+          return '<button data-st="' + s + '"' + (f.status === s ? ' aria-current="true"' : '') + '>' +
+                 FST[s].label + '</button>';
+        }).join("") + '</div>' +
+        '<button class="txt" data-act="scope">' +
+          (f.scope_out ? '별도 협의 해제' : '별도 협의로 표시') + '</button>' +
+        (f.url ? '<button class="txt" data-act="open">화면 열기 ↗</button>' : '') +
+        '<button class="txt" data-act="del">지우기</button>' +
+      '</div>' +
+      '<div class="rep">' +
+        '<textarea data-rep placeholder="고객에게 보일 답변 (비워두면 표시되지 않습니다)">' +
+          esc(f.reply || "") + '</textarea>' +
+        '<button class="btn sm ghost save" data-act="reply">답변 저장</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function bindFbCards(){
+    $("main").querySelectorAll(".fb").forEach(function(el){
+      var id = Number(el.dataset.id);
+      var f = fbRows.filter(function(x){ return x.id === id; })[0];
+      if(!f) return;
+
+      el.querySelectorAll(".seg button").forEach(function(b){
+        b.addEventListener("click", function(){
+          fbSet(id, { p_status: b.dataset.st, p_reply: null, p_scope_out: null });
+        });
+      });
+      el.querySelectorAll("[data-act]").forEach(function(b){
+        b.addEventListener("click", function(){
+          var act = b.dataset.act;
+          if(act === "scope") return fbSet(id, { p_status: null, p_reply: null, p_scope_out: !f.scope_out });
+          if(act === "open")  return window.open(f.url, "_blank", "noopener,noreferrer");
+          if(act === "reply"){
+            var t = el.querySelector("[data-rep]").value;
+            b.textContent = "저장 중…";
+            return fbSet(id, { p_status: null, p_reply: t, p_scope_out: null });
+          }
+          if(act === "del"){
+            if(!confirm(f.company + " #" + f.num + " 요청을 지울까요? 되돌릴 수 없습니다.")) return;
+            sb.rpc("admin_fb_del", { p_key: AKEY, p_id: id }).then(function(){ loadFb(); });
+          }
+        });
+      });
+    });
+  }
+
+  function fbSet(id, args){
+    args.p_key = AKEY; args.p_id = id;
+    sb.rpc("admin_fb_set", args).then(function(){ loadFb(); });
+  }
+
+  /* 개발 사이트에 붙일 스크립트 한 줄 */
+  function renderFbSetup(){
+    var r = pick;
+    var box = $("fbsetupbox");
+    box.innerHTML = '<div class="linkbox">준비 중…</div>';
+
+    var go = function(fbKey, site){
+      var tag = '<script src="' + baseUrl() + 'pin.js" data-key="' + fbKey + '"><\/script>';
+      box.innerHTML = '<div class="linkbox">' +
+        '<b>' + esc(r.company) + ' — 개발 사이트에 아래 한 줄을 넣어주세요.</b>' +
+        '<code id="pintag">' + esc(tag) + '</code>' +
+        '<button class="btn sm ghost" id="pincopy">스크립트 복사</button>' +
+        '<p style="margin-top:10px">' +
+          '개발 중인 사이트의 <b>&lt;/body&gt; 바로 앞</b>에 넣으면 됩니다. ' +
+          '고객은 화면 오른쪽 아래 <b>수정 요청</b> 버튼을 눌러 고칠 곳을 클릭하면 되고, 로그인은 필요 없습니다.<br>' +
+          '오픈할 때 이 한 줄만 지우면 흔적이 남지 않습니다.' +
+        '</p></div>';
+      $("pincopy").addEventListener("click", function(){
+        copyText(tag, $("pincopy"), "스크립트 복사");
+      });
+    };
+
+    if(r.fb_key) return go(r.fb_key, r.fb_site);
+
+    sb.rpc("admin_fb_enable", { p_key: AKEY, p_access_key: r.access_key, p_site: null })
+      .then(function(res){
+        if(res.error || !res.data){
+          box.innerHTML = '<div class="msg err">링크를 만들지 못했습니다.</div>';
+          return;
+        }
+        r.fb_key = res.data.fb_key;
+        go(res.data.fb_key, res.data.fb_site);
+      });
+  }
+
+  function fbAsText(list){
+    var out = ["수정 요청 목록", when(new Date().toISOString()), ""];
+    list.forEach(function(f){
+      var st = FST[f.status] || FST["new"];
+      out.push("#" + f.num + " [" + st.label + "]" + (f.scope_out ? " [별도 협의]" : "") +
+               " · " + f.company + " · " + f.path);
+      out.push(f.body);
+      if(f.reply) out.push("→ 답변: " + f.reply);
+      out.push("");
+    });
+    return out.join("\n");
   }
 
   function renderMain(){
